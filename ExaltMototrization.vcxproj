@@ -72,15 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;C:\Users\asachar\Downloads\boost_1_65_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;C:\Users\asachar\Downloads\boost_1_65_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;C:\Users\asachar\Downloads\boost_1_65_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;C:\Users\asachar\Downloads\boost_1_65_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\EPOS;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,11 +96,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\serial;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>EposCmd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\asachar\Downloads\boost_1_65_0\libs</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,6 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\serial;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,6 +121,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>EposCmd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\asachar\Downloads\boost_1_65_0\libs</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,13 +130,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>${SolutionDir}</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\serial;${SolutionDir}</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>EposCmd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>${SolutionDir}</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\asachar\Downloads\boost_1_65_0\libs</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
   </ItemDefinitionGroup>
@@ -136,14 +148,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>${SolutionDir}</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\asachar\Downloads\boost_1_65_0;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\Dependencies\serial;C:\Users\asachar\source\repos\avnishsachar\ExaltMototrization\serial;${SolutionDir}</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>${SolutionDir}</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\asachar\Downloads\boost_1_65_0\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>EposCmd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -151,10 +163,16 @@
   <ItemGroup>
     <ClCompile Include="CMaxonMotor.cpp" />
     <ClCompile Include="ExaltMototrization.cpp" />
+    <ClCompile Include="serial.cpp" />
+    <ClCompile Include="win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CMaxonMotor.h" />
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="serial.h" />
+    <ClInclude Include="SerialPort.h" />
+    <ClInclude Include="v8stdint.h" />
+    <ClInclude Include="win.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

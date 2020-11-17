@@ -1,62 +1,144 @@
 // ExaltMototrization.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include <stdio.h>
 #include <iostream>
 #include "CMaxonMotor.h"
 #include "Definitions.h"
+#include "serial.h"
+#include <chrono>
+#include <Windows.h>
+#include <cmath>
+#include <vector>
+
 
 using namespace std;
 
 int main(int argc, char* argv[])
 {
-    long p[2];
+    long CurrentPosition[2];
+    long motor_velocity = 0;
+    const std::string port = "COM3";
+    uint32_t  baud = 115200;
+    const int size = 7;
+    unsigned char exalt_state[size];
+    unsigned int joystick_ud = 0;
+    unsigned int joystick_rl = 0;
+    unsigned int button_joystick = 1;
+    unsigned int button_joystick_previous = 1;
+    unsigned int button_home = 1;
+    unsigned int button_home_previous = 1;
+    int p_gain = 20;
+
+
     CMaxonMotor motor;
 
     motor.InitializeAllDevices();
-    motor.HomeAllDevices();
-    motor.CloseAllDevice();
-    //motor.ActiviateAllDevice();
+    std::vector<long> home_position = motor.HomingProcedureAllDevices();
+    
+    serial::Serial serial_port (port, baud, serial::Timeout::simpleTimeout(1000));
+    if (!serial_port.isOpen()) {
+        std::cout << "Serial Connection Failed" << endl;
+    }
+    else {
+        serial_port.flush(); // flush the port 
+        std::cout << "serial Connection successful" << endl;
+    }
+    bool exit_flag = TRUE;
 
-    //long targetPos[2];
-    //targetPos[0] = 0;*
-    //targetPos[1] = 0;
-    //    for (int i=0;i<100;i++){
-    //    	targetpos[0]=i*400;
-    //		targetpos[1]=i*400;
-    //	    motor.movealldevice(targetpos);
-    //	    if (i%5 == 1 ) {
-    	/*	    motor.getcurrentpositionalldevice(p);
-    	    	cout << "current position: " << p[0] << "\t" << p[1] << "\t";;
-    	    	cout << "e: " << p[0] - targetpos[0] << "\t" << p[1] - targetpos[1] << endl;
-    	    }
-        }*/
-    //
-    //    for (int i=0;i<100;i++){
-    //        	targetPos[0]=40000-i*800;
-    //    		targetPos[1]=40000-i*800;
-    //    	    motor.MoveAllDevice(targetPos);
-    //    	    if (i%5 == 1 ) {
-    //    	    	motor.GetCurrentPositionAllDevice(p);
-    //    	    	cout << "Current Position: " << p[0] << "\t" << p[1] << "\t";;
-    //    	    	cout << "e: " << p[0] - targetPos[0] << "\t" << p[1] - targetPos[1] << endl;
-    //    	    }
-    //	}
-    //
+    while (exit_flag) {
+        auto reset = chrono::steady_clock::duration::zero();
+        auto zero = std::chrono::steady_clock::now();
+        if (GetAsyncKeyState(VK_ESCAPE)) {
+            exit_flag = FALSE;
+            std::cout << "ESC PRESSED - EXIT" << endl;
+        }
+        auto start = std::chrono::steady_clock::now();
+        serial_port.write("r");
+        auto end = std::chrono::steady_clock::now();
+        while (serial_port.getBytesize() < 7 && chrono::duration_cast<chrono::milliseconds>(end - start).count() < 100) {
+        }
+        if (serial_port.getBytesize() >= 7 ) {
+            //auto result = serial_port.read(size);
+            cout << "AL" << endl;
+            std::copy(serial_port.read(size).begin(), serial_port.read(size).end(), exalt_state);
+            cout << "ALL OKAY" << endl;
+            exalt_state[serial_port.read(size).length()] = 0;
+            joystick_ud = (uint8_t)exalt_state[2] * 256 + exalt_state[3];
+            std::cout << "UP DOWN: " << joystick_ud << endl;
+            joystick_rl = (uint8_t)exalt_state[4] * 256 + exalt_state[5];
+            std::cout << "RIGHT LEFT: " << joystick_rl << endl;
 
-    //    for (int i=0;i<1000;i++){
-    //    	motor.MoveAllDevice(targetPos);
-    //    	if (i%1000 == 1 ) {
-    //    		cout << i << endl;
-    //    	}
-    //    }
+            //Update the velocity mode. 
+            button_joystick = (uint8_t)exalt_state[6] >> 2;
 
-    cout << "Press <Enter> to stop and quit..." << endl;
-    getchar();
+            button_home = ((uint8_t)exalt_state[6] >> 1) & 0x01;
 
 
+            if (button_joystick == 0 && button_joystick_previous == 1)
+            {
+                if (p_gain == 20) {
+                    p_gain = 5;
+                    std::cout << "Speed Setting: LOW" << endl;
+                }
+                else if (p_gain == 12) {
+                    p_gain = 20;
+                    std::cout << "Speed Setting: HIGH" << endl;
+                }
+                else if (p_gain == 5) {
+                    p_gain = 12;
+                    std::cout << "Speed Setting: NORMAL" << endl;
+                }
+                else {
+                    p_gain = 20;
+                    std::cout << "Speed Setting: HIGH" << endl;
+                }
+            }
+            if (button_home == 0 && button_home_previous == 1)
+            {
+                std::cout <<"Home"<< endl;
+                motor.HomeAllDevices(home_position);
+                motor.GetCurrentPositionAllDevice(CurrentPosition);
+                while ((abs(CurrentPosition[0] - home_position[0]) > 100) || (abs(CurrentPosition[0] - home_position[0]) > 100))
+                {
+
+                }
+
+                motor.ActivateProfileVelocityModeAll();
+            }
+            // Update the previous button condition
+            button_joystick_previous = button_joystick;
+            button_home_previous = button_home;
+            motor.ActivateProfileVelocityModeAll();
+            // Set the motor velocity for the right/left motor based on the joystick position 
+            // Use a deadband to prevent motor creep when the joystick is at the zero position
+            if (abs((int)joystick_rl - 512) < 30)
+            {
+                motor_velocity = 0;
+            }
+            else
+            {
+                motor_velocity = ((int)joystick_rl - 512) * p_gain;
+            }
+
+            motor.MoveWithVelocityOne(motor_velocity);
+
+            // Set the motor velocity for the up/down motor based on the joystick position
+            // Use a deadband to prevent motor creep when the joystick is at the zero position
+            if (abs((int)joystick_ud - 512) < 30)
+            {
+                motor_velocity = 0;
+            }
+            else
+            {
+                motor_velocity = ((int)joystick_ud - 512) * p_gain;
+            }
+
+            motor.MoveWithVelocityTwo(motor_velocity);
+        }
+    }
+    serial_port.close();
     motor.DisableAllDevice();
-
+    motor.CloseAllDevice();
     return 0;
 }
 

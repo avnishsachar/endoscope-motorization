@@ -1,8 +1,3 @@
-#include <string.h>
-#include <iostream>
-#include <stdlib.h>
-#include <cmath>
-#include "Definitions.h"
 #include "CMaxonMotor.h"
 
 using namespace std;
@@ -126,53 +121,13 @@ void CMaxonMotor::EnableDevice(void* keyHandle_, unsigned short nodeId)
 void CMaxonMotor::DisableDevice(void* keyHandle_, unsigned short nodeId)
 {
     DWORD errorCode = 0;
-    int IsInFault = FALSE;
 
-    //    // Disabling Position Analog Input Mode
-    //    if( VCS_DisableAnalogPositionSetpoint(keyHandle_, nodeId, &errorCode))
-    //    {
-    //        cout<<"Disabled position analog input mode!"<<endl;
-    //    }
-    //    else
-    //    {
-    //        cout<<"Failed to disable position analog input mode!, error code="<<errorCode<<endl;
-    //    }
-    //
-
-    //    // Deactivating Position Analog Input Mode
-    //    if( VCS_DeactivateAnalogPositionSetpoint(keyHandle_, nodeId, 1, &errorCode))
-    //    {
-    //        cout<<"Deactivated position analog input mode!"<<endl;
-    //    }
-    //    else
-    //    {
-    //        cout<<"Failed to deactivate position analog input mode!, error code="<<errorCode<<endl;
-    //    }
-
-    if (VCS_GetFaultState(keyHandle_, nodeId, &IsInFault, &errorCode))
+    int IsEnabled = FALSE;
+    if (VCS_GetEnableState(keyHandle_, nodeId, &IsEnabled, &errorCode))
     {
-        if (IsInFault && !VCS_ClearFault(keyHandle_, nodeId, &errorCode))
-        {
-            cout << "Clear fault failed!, error code=" << errorCode << endl;
-            return;
-        }
-
-        int IsEnabled = FALSE;
-        if (VCS_GetEnableState(keyHandle_, nodeId, &IsEnabled, &errorCode))
-        {
-            if (IsEnabled && !VCS_SetDisableState(keyHandle_, nodeId, &errorCode))
-            {
-                cout << "Set disable state failed!, error code=" << errorCode << endl;
-            }
-            else
-            {
-                cout << "Set disable state succeeded!" << endl;
-            }
-        }
-    }
-    else
-    {
-        cout << "Get fault state failed!, error code=" << errorCode << endl;
+        cout << "Device is enabled" << endl;
+        VCS_SetDisableState(keyHandle_, nodeId, &errorCode);
+        cout << "Set disable state succeeded!" << endl;
     }
 }
 
@@ -193,7 +148,7 @@ long CMaxonMotor::HomingProcedure(void* keyHandle_, unsigned short nodeId) {
         VCS_GetCurrentIs(keyHandle_, nodeId, &currentValue, &errorCode);
         VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
         cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
-     } while (currentValue < 200); // value at 500 when load is there
+     } while (currentValue < 200); // value at 500 when load is attached
     // stopping motor
     VCS_MoveWithVelocity(keyHandle_, nodeId, 0, &errorCode);
     VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
@@ -272,42 +227,6 @@ void CMaxonMotor::Move(void* keyHandle_, long TargetPosition, unsigned short nod
     //    }
 }
 
-//
-//void CMaxonMotor::GetCurrentPosition(int& CurrentPosition)
-//{
-//
-//    DWORD errorCode = 0;
-//
-//    if( !VCS_GetPositionIs(keyHandle, nodeID, &CurrentPosition, &errorCode) ){
-//        cout << " error while getting current position , error code="<<errorCode<<endl;
-//    }
-//
-////    DWORD MA;
-////    if( !VCS_GetMaxAcceleration(keyHandle, nodeID, &MA, &errorCode) ){
-////        cout << " error while getting Max Acc, error code="<<errorCode<<endl;
-////    }
-//
-////    DWORD SMA=5000000;
-////    if( !VCS_SetMaxAcceleration(keyHandle, nodeID, SMA, &errorCode) ){
-////        cout << " error while Setting Max Acc, error code="<<errorCode<<endl;
-////    }
-//
-////    DWORD SMV=2000;
-////    if( !VCS_SetMaxProfileVelocity(keyHandle, nodeID, SMV, &errorCode) ){
-////        cout << " error while Setting Max Vel, error code="<<errorCode<<endl;
-////    }
-//
-////    DWORD MV;
-////    if( !VCS_GetMaxProfileVelocity(keyHandle, nodeID, &MV, &errorCode) ){
-////        cout << " error while getting Max Vel, error code="<<errorCode<<endl;
-////    }
-//
-////    cout << "MA :" << MA << endl;
-////    cout << "MV :" << MV << endl;
-//
-//
-//}
-
 void CMaxonMotor::Halt(void* keyHandle_, unsigned short nodeId)
 {
     DWORD errorCode = 0;
@@ -362,27 +281,33 @@ void* CMaxonMotor::ActivateDevice(const char* portName, unsigned short nodeId)
     return keyHandle_;
 }
 
+void CMaxonMotor::HomeAllDevices(vector<long> home_position) {
+    VCS_ActivateProfilePositionMode(keyHandle_0, nodeId_0, &errorCode);
+    SetPositionProfile(keyHandle_0, nodeId_0);
+    Move(keyHandle_0, home_position[0], nodeId_0);
 
+    SetPositionProfile(keyHandle_1, nodeId_1);
+    VCS_ActivateProfilePositionMode(keyHandle_1, nodeId_1, &errorCode);
+    Move(keyHandle_1, home_position[1], nodeId_1);
+}
 
-//void CMaxonMotor::GetPositionProfile(){
-//
-//    unsigned int errorCode = 0;
-//    unsigned int pProfileVelocity,pProfileAcceleration, pProfileDeceleration;
-//
-//    if( !VCS_GetPositionProfile(keyHandle, nodeID, &pProfileVelocity, &pProfileAcceleration, &pProfileDeceleration, &errorCode) ) {
-//        cout << "VCS_GetPositionProfile failed!, error code="<<errorCode<<endl;
-//    }
-//    cout << "profile: " << pProfileVelocity << "\t" << pProfileAcceleration << "\t" << pProfileDeceleration << endl;
-//
-//}
-//
-//void CMaxonMotor::SetPositionProfile(unsigned int ProfileVelocity, unsigned int ProfileAcc, unsigned int ProfileDec){
-//    unsigned int errorCode = 0;
-//    if( !VCS_SetPositionProfile(keyHandle, nodeID, ProfileVelocity, ProfileAcc, ProfileDec, &errorCode) ) {
-//        cout << "VCS_SetPositionProfile failed!, error code="<<errorCode<<endl;
-//    }
-//
-//}
+void CMaxonMotor::ActivateProfileVelocityModeAll() {
+    VCS_ActivateProfileVelocityMode(keyHandle_0, nodeId_0, &errorCode);
+    VCS_ActivateProfileVelocityMode(keyHandle_1, nodeId_1, &errorCode);
+}
+
+void CMaxonMotor::SetPositionProfile(void* keyHandle_, unsigned short nodeId){
+    DWORD ProfileVelocity = 5000;
+    DWORD ProfileAcceleration = 100000;
+    DWORD ProfileDeceleration = 100000;
+    if (!VCS_SetPositionProfile(keyHandle_, nodeId, ProfileVelocity, ProfileAcceleration, ProfileDeceleration, &errorCode)) {
+        cout << "Failed to change operation mode to \"Profile Position Mode\" for device. [ERROR]: " << errorCode << endl;
+    }
+    else
+    {
+        cout << "Successfully set Profile Position Mode." << endl;
+    }
+}
 
 /**
  * Closes any active devices, releases the port(s). Activates and Initializes devices at the port(s).
@@ -395,30 +320,22 @@ void CMaxonMotor::InitializeAllDevices(){
 
 }
 
-void CMaxonMotor::HomeAllDevices() {
-    HomingProcedure(keyHandle_0, nodeId_0);
-    HomingProcedure(keyHandle_1, nodeId_1);
+std::vector<long> CMaxonMotor::HomingProcedureAllDevices() {
+    vector<long> home_position;
+    home_position.push_back(HomingProcedure(keyHandle_0, nodeId_0));
+    home_position.push_back(HomingProcedure(keyHandle_1, nodeId_1));
+    return home_position;
 }
-
-
-
 
 void CMaxonMotor::CloseAllDevice() {
     CloseDevice(keyHandle_0);
     CloseDevice(keyHandle_1);
 }
 
-//
-//void CMaxonMotor::ActiviateAllDevice() {
-//    keyHandle_0 = ActivateDevice(PortName_0, nodeId_0);
-//    keyHandle_1 = ActivateDevice(PortName_1, nodeId_1);
-//}
-
 void CMaxonMotor::DisableAllDevice() {
     DisableDevice(keyHandle_0, nodeId_0);
     DisableDevice(keyHandle_1, nodeId_1);
 }
-
 
 void CMaxonMotor::GetCurrentPosition(void* keyHandle_, long& CurrentPosition, unsigned short nodeId) {
     DWORD errorCode = 0;
@@ -436,8 +353,26 @@ void CMaxonMotor::GetCurrentPositionAllDevice(long* CurrentPosition) {
     CurrentPosition[1] = Pos;
 }
 
-
 void CMaxonMotor::MoveAllDevice(const long* TargetPosition) {
     Move(keyHandle_0, TargetPosition[0], nodeId_0);
     Move(keyHandle_1, TargetPosition[0], nodeId_1);
+}
+
+void CMaxonMotor::MoveWithVelocityOne(long motor_velocity) {
+    if (!VCS_MoveWithVelocity(keyHandle_0, nodeId_0, motor_velocity, &errorCode)) {
+        cout << "Failed to change Move Velocity through Joystick. [ERROR]: " << errorCode << endl;
+    }
+    else
+    {
+      //  cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
+    }
+}
+void CMaxonMotor::MoveWithVelocityTwo(long motor_velocity) {
+    if (!VCS_MoveWithVelocity(keyHandle_1, nodeId_1, motor_velocity, &errorCode)) {
+        cout << "Failed to change Move Velocity through Joystick. [ERROR]: " << errorCode << endl;
+    }
+    else
+    {
+       // cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
+    }
 }
