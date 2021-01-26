@@ -147,8 +147,8 @@ long CMaxonMotor::HomingProcedure(void* keyHandle_, unsigned short nodeId) {
      do {
         VCS_GetCurrentIs(keyHandle_, nodeId, &currentValue, &errorCode);
         VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
-        cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
-     } while (currentValue < 200); // value at 500 when load is attached
+        // cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
+     } while (currentValue < 500); // value at 500 when load is attached
     // stopping motor
     VCS_MoveWithVelocity(keyHandle_, nodeId, 0, &errorCode);
     VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
@@ -159,8 +159,8 @@ long CMaxonMotor::HomingProcedure(void* keyHandle_, unsigned short nodeId) {
     do {
         VCS_GetCurrentIs(keyHandle_, nodeId, &currentValue, &errorCode);
         VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
-        cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
-    } while (currentValue > -200);
+        // cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
+    } while (currentValue > -500);
     // stopping motor
     VCS_MoveWithVelocity(keyHandle_, nodeId, 0, &errorCode);
     VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
@@ -364,7 +364,7 @@ void CMaxonMotor::MoveWithVelocityOne(long motor_velocity) {
     }
     else
     {
-      //  cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
+       cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
     }
 }
 void CMaxonMotor::MoveWithVelocityTwo(long motor_velocity) {
@@ -373,6 +373,6 @@ void CMaxonMotor::MoveWithVelocityTwo(long motor_velocity) {
     }
     else
     {
-       // cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
+       cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
     }
 }

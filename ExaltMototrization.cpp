@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     const std::string port = "COM3";
     uint32_t  baud = 115200;
     const int size = 7;
-    unsigned char exalt_state[size];
+    std::string exalt_state = {0, size};
     unsigned int joystick_ud = 0;
     unsigned int joystick_rl = 0;
     unsigned int button_joystick = 1;
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     motor.InitializeAllDevices();
     std::vector<long> home_position = motor.HomingProcedureAllDevices();
     
-    serial::Serial serial_port (port, baud, serial::Timeout::simpleTimeout(1000));
+    serial::Serial serial_port (port, baud, serial::Timeout::simpleTimeout(300));
     if (!serial_port.isOpen()) {
         std::cout << "Serial Connection Failed" << endl;
     }
@@ -58,21 +58,16 @@ int main(int argc, char* argv[])
         while (serial_port.getBytesize() < 7 && chrono::duration_cast<chrono::milliseconds>(end - start).count() < 100) {
         }
         if (serial_port.getBytesize() >= 7 ) {
-            //auto result = serial_port.read(size);
-            cout << "AL" << endl;
-            std::copy(serial_port.read(size).begin(), serial_port.read(size).end(), exalt_state);
-            cout << "ALL OKAY" << endl;
-            exalt_state[serial_port.read(size).length()] = 0;
-            joystick_ud = (uint8_t)exalt_state[2] * 256 + exalt_state[3];
-            std::cout << "UP DOWN: " << joystick_ud << endl;
-            joystick_rl = (uint8_t)exalt_state[4] * 256 + exalt_state[5];
-            std::cout << "RIGHT LEFT: " << joystick_rl << endl;
+            exalt_state = serial_port.read(size);
+            if (exalt_state.length() == 0)
+                continue;
+            joystick_ud = (uint8_t)exalt_state[2] * 256 + (uint8_t)exalt_state[3];
+            joystick_rl = (uint8_t)exalt_state[4] * 256 + (uint8_t)exalt_state[5];
 
             //Update the velocity mode. 
             button_joystick = (uint8_t)exalt_state[6] >> 2;
 
             button_home = ((uint8_t)exalt_state[6] >> 1) & 0x01;
-
 
             if (button_joystick == 0 && button_joystick_previous == 1)
             {
@@ -111,7 +106,7 @@ int main(int argc, char* argv[])
             motor.ActivateProfileVelocityModeAll();
             // Set the motor velocity for the right/left motor based on the joystick position 
             // Use a deadband to prevent motor creep when the joystick is at the zero position
-            if (abs((int)joystick_rl - 512) < 30)
+            if (abs((int)joystick_rl - 512) < 10)
             {
                 motor_velocity = 0;
             }
@@ -124,7 +119,7 @@ int main(int argc, char* argv[])
 
             // Set the motor velocity for the up/down motor based on the joystick position
             // Use a deadband to prevent motor creep when the joystick is at the zero position
-            if (abs((int)joystick_ud - 512) < 30)
+            if (abs((int)joystick_ud - 512) < 10)
             {
                 motor_velocity = 0;
             }
