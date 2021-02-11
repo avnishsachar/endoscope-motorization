@@ -72,10 +72,10 @@ void CMaxonMotor::EnableDevice(void* keyHandle_, unsigned short nodeId)
     if (!VCS_ActivateProfilePositionMode(keyHandle_, nodeId, &errorCode)) {
         cout << "Failed to activate Profile Position Mode. [ERROR]" << errorCode << endl;
     }
-    else
-    {
-        cout << "Successfully activated Profile Position Mode." << endl;
-    }
+    //else
+    //{
+    //    cout << "Successfully activated Profile Position Mode." << endl;
+    //
 
 
     DWORD ProfileVelocity = 5000;
@@ -85,36 +85,36 @@ void CMaxonMotor::EnableDevice(void* keyHandle_, unsigned short nodeId)
     if (!VCS_SetPositionProfile(keyHandle_, nodeId, ProfileVelocity, ProfileAcceleration, ProfileDeceleration, &errorCode)) {
         cout << "Failed to change operation mode to \"Profile Position Mode\" for device. [ERROR]: " << errorCode << endl;
     }
-    else
-    {
-        cout << "Successfully set Profile Position Mode." << endl;
-    }
+    //else
+    //{
+    //    cout << "Successfully set Profile Position Mode." << endl;
+    //}
 
 
     if (!VCS_ActivateProfileVelocityMode(keyHandle_, nodeId, &errorCode)) {
         cout << "Failed to activate Profile Velocity Mode. [ERROR]" << errorCode << endl;
     }
-    else
-    {
-        cout << "Successfully activated Profile Velocity Mode." << endl;
-    }
+    //else
+    //{
+    //    cout << "Successfully activated Profile Velocity Mode." << endl;
+        //}
 
     if (!VCS_SetVelocityProfile(keyHandle_, nodeId, ProfileAcceleration, ProfileDeceleration, &errorCode)) {
         cout << "Failed to change operation mode to \"Profile Velocity Mode\" for device. [ERROR]: " << errorCode << endl;
     }
-    else
-    {
-        cout << "Successfully set Profile Velocity Mode." << endl;
-    }
+    //else
+    //{
+    //    cout << "Successfully set Profile Velocity Mode." << endl;
+    //}
 
     long TargetVelocity = 0;
     if (!VCS_MoveWithVelocity(keyHandle_, nodeId, TargetVelocity, &errorCode)) {
         cout << "Failed to change Move Velocity for device. [ERROR]: " << errorCode << endl;
     }
-    else
-    {
-        cout << "Successfully set Move Velocity." << endl;
-    }
+    //else
+    //{
+    //    cout << "Successfully set Move Velocity." << endl;
+    //}
 
 }
 
@@ -147,7 +147,6 @@ long CMaxonMotor::HomingProcedure(void* keyHandle_, unsigned short nodeId) {
      do {
         VCS_GetCurrentIs(keyHandle_, nodeId, &currentValue, &errorCode);
         VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
-        // cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
      } while (currentValue < 500); // value at 500 when load is attached
     // stopping motor
     VCS_MoveWithVelocity(keyHandle_, nodeId, 0, &errorCode);
@@ -159,14 +158,13 @@ long CMaxonMotor::HomingProcedure(void* keyHandle_, unsigned short nodeId) {
     do {
         VCS_GetCurrentIs(keyHandle_, nodeId, &currentValue, &errorCode);
         VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
-        // cout << "homing operation." << "Motor Current: " << currentValue << " Motor Position: " << positionValue << endl;
     } while (currentValue > -500);
     // stopping motor
     VCS_MoveWithVelocity(keyHandle_, nodeId, 0, &errorCode);
     VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
     const long kminPosition = positionValue;
 
-    cout << "minimum position:" << kminPosition << " and max position: " << kmaxPosition << endl;
+    //cout << "minimum position:" << kminPosition << " and max position: " << kmaxPosition << endl;
 
     long homePosition = (kminPosition + kmaxPosition) / 2;
     VCS_ActivateProfilePositionMode(keyHandle_, nodeId, &errorCode);
@@ -174,13 +172,9 @@ long CMaxonMotor::HomingProcedure(void* keyHandle_, unsigned short nodeId) {
     VCS_MoveToPosition(keyHandle_, nodeId, homePosition, TRUE, TRUE, &errorCode);
 
     while (abs(positionValue - homePosition) > 100) {
-        VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
-        cout << " Motor Position is:" << positionValue << endl;
+         VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
     }
-
     return homePosition;
-
-
 }
 
 void CMaxonMotor::Move(void* keyHandle_, long TargetPosition, unsigned short nodeId)
@@ -190,41 +184,16 @@ void CMaxonMotor::Move(void* keyHandle_, long TargetPosition, unsigned short nod
 
     int Absolute = TRUE; // FALSE;
     int Immediately = TRUE;
+    long positionValue = 0;
 
 
-    if (!VCS_MoveToPosition(keyHandle_, nodeId, TargetPosition, Absolute, Immediately, &errorCode)) {
-        cout << "Move to position failed!, error code=" << errorCode << endl;
+    VCS_ActivateProfilePositionMode(keyHandle_, nodeId, &errorCode);
+    VCS_SetPositionProfile(keyHandle_, nodeId, 5000, 100000, 100000, &errorCode);
+    VCS_MoveToPosition(keyHandle_, nodeId, TargetPosition, TRUE, TRUE, &errorCode);
+
+    while (abs(positionValue - TargetPosition) > 100) {
+        VCS_GetPositionIs(keyHandle_, nodeId, &positionValue, &errorCode);
     }
-
-    //    DWORD errorCode = 0;
-    //
-    //    DWORD ProfileVelocity = 10000;
-    //    DWORD ProfileAcceleration = 8000;
-    //    DWORD ProfileDeceleration = 8000;
-    //
-    //
-    //    if( VCS_ActivatePositionMode(keyHandle_, nodeId, &errorCode) )
-    //    {
-    //        int Absolute = TRUE;
-    //        int Immediately = TRUE;
-    //
-    //        if( !Absolute )
-    //        {
-    //            int PositionIs = 0;
-    //
-    //            if( VCS_GetPositionIs(keyHandle_, nodeId, &PositionIs, &errorCode) );
-    //        }
-    //
-    //        if( !VCS_MoveToPosition(keyHandle_, nodeId, TargetPosition, Absolute, Immediately, &errorCode) )
-    //        {
-    //            cout<<"Move to position failed!, Error code="<<errorCode<<endl;
-    //        }
-    //
-    //    }
-    //    else
-    //    {
-    //        cout<<"Activate profile position mode failed!, Error code="<<errorCode<<endl;
-    //    }
 }
 
 void CMaxonMotor::Halt(void* keyHandle_, unsigned short nodeId)
@@ -286,8 +255,8 @@ void CMaxonMotor::HomeAllDevices(vector<long> home_position) {
     SetPositionProfile(keyHandle_0, nodeId_0);
     Move(keyHandle_0, home_position[0], nodeId_0);
 
-    SetPositionProfile(keyHandle_1, nodeId_1);
     VCS_ActivateProfilePositionMode(keyHandle_1, nodeId_1, &errorCode);
+    SetPositionProfile(keyHandle_1, nodeId_1);
     Move(keyHandle_1, home_position[1], nodeId_1);
 }
 
@@ -303,10 +272,10 @@ void CMaxonMotor::SetPositionProfile(void* keyHandle_, unsigned short nodeId){
     if (!VCS_SetPositionProfile(keyHandle_, nodeId, ProfileVelocity, ProfileAcceleration, ProfileDeceleration, &errorCode)) {
         cout << "Failed to change operation mode to \"Profile Position Mode\" for device. [ERROR]: " << errorCode << endl;
     }
-    else
-    {
-        cout << "Successfully set Profile Position Mode." << endl;
-    }
+    //else
+    //{
+    //    cout << "Successfully set Profile Position Mode." << endl;
+    //}
 }
 
 /**
@@ -362,17 +331,9 @@ void CMaxonMotor::MoveWithVelocityOne(long motor_velocity) {
     if (!VCS_MoveWithVelocity(keyHandle_0, nodeId_0, motor_velocity, &errorCode)) {
         cout << "Failed to change Move Velocity through Joystick. [ERROR]: " << errorCode << endl;
     }
-    else
-    {
-       cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
-    }
 }
 void CMaxonMotor::MoveWithVelocityTwo(long motor_velocity) {
     if (!VCS_MoveWithVelocity(keyHandle_1, nodeId_1, motor_velocity, &errorCode)) {
         cout << "Failed to change Move Velocity through Joystick. [ERROR]: " << errorCode << endl;
-    }
-    else
-    {
-       cout << "Successfully set Move Velocity through Joystick to" << motor_velocity << endl;
     }
 }

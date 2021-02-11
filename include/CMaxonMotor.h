@@ -24,7 +24,8 @@ private:
     DWORD errorCode;
     unsigned short nodeId_0;
     unsigned short nodeId_1;
-    void* keyHandle_0, * keyHandle_1;
+    void* keyHandle_0 = NULL;
+    void* keyHandle_1 = NULL;
 
     void EnableDevice(void* keyHandle_, unsigned short nodeId);
     void DisableDevice(void* keyHandle_, unsigned short nodeId);
@@ -32,6 +33,7 @@ private:
     long HomingProcedure(void* keyHandle_, unsigned short nodeId);
     void CloseDevice(void* keyHandle_);
     void Move(void* keyHandle_, long TargetPosition, unsigned short nodeId);
+    void NeutralPosition(void* keyHandle_, long NeutralPosition, unsigned short nodeId);
     void GetCurrentPosition(void* keyHandle_, long& CurrentPosition, unsigned short nodeId);
     void SetPositionProfile(void* keyHandle_, unsigned short nodeId);
     void Halt(void* keyHandle_, unsigned short nodeId);
@@ -41,7 +43,6 @@ public:
 
     void InitializeAllDevices(); // Initialize devices at the start 
     void CloseAllDevice();
-    void ActiviateAllDevice();
     void DisableAllDevice();
     void GetCurrentPositionAllDevice(long* CurrentPosition);
     void MoveAllDevice(const long* TargetPosition);

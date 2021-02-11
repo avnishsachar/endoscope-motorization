@@ -46,18 +46,21 @@ int main(int argc, char* argv[])
     bool exit_flag = TRUE;
 
     while (exit_flag) {
-        auto reset = chrono::steady_clock::duration::zero();
-        auto zero = std::chrono::steady_clock::now();
         if (GetAsyncKeyState(VK_ESCAPE)) {
             exit_flag = FALSE;
             std::cout << "ESC PRESSED - EXIT" << endl;
         }
+        auto reset = chrono::steady_clock::duration::zero();
         auto start = std::chrono::steady_clock::now();
+        serial_port.flush();
         serial_port.write("r");
         auto end = std::chrono::steady_clock::now();
+
         while (serial_port.getBytesize() < 7 && chrono::duration_cast<chrono::milliseconds>(end - start).count() < 100) {
         }
+
         if (serial_port.getBytesize() >= 7 ) {
+
             exalt_state = serial_port.read(size);
             if (exalt_state.length() == 0)
                 continue;
@@ -90,14 +93,9 @@ int main(int argc, char* argv[])
             }
             if (button_home == 0 && button_home_previous == 1)
             {
-                std::cout <<"Home"<< endl;
+                //std::cout << home_position[0]<< endl;
+                //std::cout << home_position[1] << endl;
                 motor.HomeAllDevices(home_position);
-                motor.GetCurrentPositionAllDevice(CurrentPosition);
-                while ((abs(CurrentPosition[0] - home_position[0]) > 100) || (abs(CurrentPosition[0] - home_position[0]) > 100))
-                {
-
-                }
-
                 motor.ActivateProfileVelocityModeAll();
             }
             // Update the previous button condition
@@ -106,20 +104,20 @@ int main(int argc, char* argv[])
             motor.ActivateProfileVelocityModeAll();
             // Set the motor velocity for the right/left motor based on the joystick position 
             // Use a deadband to prevent motor creep when the joystick is at the zero position
-            if (abs((int)joystick_rl - 512) < 10)
+            if (abs((int)joystick_rl - 512) < 20)
             {
                 motor_velocity = 0;
             }
             else
             {
-                motor_velocity = ((int)joystick_rl - 512) * p_gain;
+                motor_velocity = -((int)joystick_rl - 512) * p_gain;
             }
 
             motor.MoveWithVelocityOne(motor_velocity);
 
             // Set the motor velocity for the up/down motor based on the joystick position
             // Use a deadband to prevent motor creep when the joystick is at the zero position
-            if (abs((int)joystick_ud - 512) < 10)
+            if (abs((int)joystick_ud - 512) < 20)
             {
                 motor_velocity = 0;
             }
@@ -127,7 +125,6 @@ int main(int argc, char* argv[])
             {
                 motor_velocity = ((int)joystick_ud - 512) * p_gain;
             }
-
             motor.MoveWithVelocityTwo(motor_velocity);
         }
     }
